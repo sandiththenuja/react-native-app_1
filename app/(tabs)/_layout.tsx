@@ -6,6 +6,7 @@ import clsx from 'clsx'
 import {colors, components} from '@/constants/theme'
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+
 interface TabIconProps{
     focused: boolean
     icon: any
