@@ -1,8 +1,8 @@
 import { useAuth } from "@clerk/expo";
 import { Redirect } from "expo-router";
-import { ActivityIndicator, View, Text } from "react-native";
+import { ActivityIndicator, View } from "react-native";
 
-const Onboarding = () => {
+export default function Index() {
   const { isLoaded, isSignedIn } = useAuth();
 
   if (!isLoaded) {
@@ -13,15 +13,7 @@ const Onboarding = () => {
     );
   }
 
-  if (!isSignedIn) {
-    return <Redirect href="/(auth)/sign-in" />;
-  }
-
   return (
-    <View className="flex-1 items-center justify-center bg-background">
-      <Text>onboarding</Text>
-    </View>
-  )
+    <Redirect href={isSignedIn ? "/(tabs)" : "/(auth)/sign-in"} />
+  );
 }
-
-export default Onboarding
