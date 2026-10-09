@@ -3,37 +3,6 @@ import { icons } from "./icons";
 import { ImageSource } from 'expo-image';
 export type IconSource = ImageSource;
 
-export interface AppTab {
-    name: string;
-    title: string;
-    icon: IconSource;
-}
-
-export interface UpcomingSubscription {
-    id: string;
-    icon: IconSource;
-    name: string;
-    price: number;
-    currency: string;
-    daysLeft: number;
-}
-
-export interface Subscription {
-    id: string;
-    icon: IconSource;
-    name: string;
-    plan: string;
-    category: string;
-    paymentMethod: string;
-    status: 'active' | 'paused' | 'cancelled';
-    startDate: string;
-    price: number;
-    currency: string;
-    billing: 'Monthly' | 'Yearly' | 'Weekly';
-    renewalDate: string;
-    color: string;
-}
-
 export const tabs: AppTab[] = [
     { name: "index", title: "Home", icon: icons.home },
     { name: "subscriptions", title: "Subscriptions", icon: icons.wallet },
