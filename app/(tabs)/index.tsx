@@ -1,19 +1,38 @@
 import { Image } from "expo-image";
-import { Link } from "expo-router";
-import { FlatList, ScrollView, Text, View } from "react-native";
+import { FlatList, Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import image from "@/constants/image";
-import { HOME_BALANCE, HOME_SUBSCRIPTIONS, HOME_USER, UPCOMING_SUBSCRIPTIONS } from "@/constants/data";
+import { HOME_BALANCE, HOME_USER, UPCOMING_SUBSCRIPTIONS } from "@/constants/data";
 import { icons } from "@/constants/icons";
 import { formatCurrency } from "@/lib/utils";
+import { addSubscription, useSubscriptions } from "@/lib/subscription-store";
 import dayjs from "dayjs";
 import ListHeading from "@/components/ListHeading";
 import UpcomingSubscriptionCard from "@/components/UpcomingSubscriptionCard";
 import SubscriptionCard from "@/components/SubscriptionCard";
+import CreateSubscriptionModal from "@/components/CreateSubscriptionModal";
+import { posthog } from "@/lib/posthog";
+import { posthogLogger } from "@/lib/posthog-logger";
 import { useState } from "react";
  
 export default function App() {
   const [expandedSubscriptionId, setExpandedSubscriptionId] = useState<string | null>(null)
+  const subscriptions = useSubscriptions()
+  const [isCreateModalVisible, setIsCreateModalVisible] = useState(false)
+
+  function handleSubscriptionDetailsToggle(subscriptionId: string) {
+    const isExpanded = expandedSubscriptionId !== subscriptionId;
+    posthog?.capture("subscription_details_toggled", { is_expanded: isExpanded });
+    posthogLogger.info("subscription details state changed", {
+      is_expanded: isExpanded,
+    });
+    setExpandedSubscriptionId(isExpanded ? subscriptionId : null);
+  }
+
+  function handleCreateSubscription(subscription: Subscription) {
+    addSubscription(subscription);
+    setExpandedSubscriptionId(null);
+  }
 
   return (
     <SafeAreaView style={{flex: 1}}>
@@ -28,7 +47,14 @@ export default function App() {
                 <Text className="home-user-name">{HOME_USER.name}</Text>
               </View>
 
-              <Image source={icons.add} className="home-add-icon" />
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Add subscription"
+                className="home-add-button"
+                onPress={() => setIsCreateModalVisible(true)}
+              >
+                <Image source={icons.add} className="home-add-icon" />
+              </Pressable>
             </View>
 
             <View className="home-balance-card">
@@ -62,13 +88,13 @@ export default function App() {
           <ListHeading title="All Subscriptions" />
           </>
         )}
-          data={HOME_SUBSCRIPTIONS}
+          data={subscriptions}
           keyExtractor={(item) => item.id}
           renderItem={({item}) => (
             <SubscriptionCard 
               {...item}
               expanded={expandedSubscriptionId === item.id}
-              onPress={() => setExpandedSubscriptionId((currentId) => (currentId === item.id ? null : item.id))} />
+              onPress={() => handleSubscriptionDetailsToggle(item.id)} />
           )}
           extraData={expandedSubscriptionId}
           ItemSeparatorComponent={() => <View className="h-4" />}
@@ -78,6 +104,11 @@ export default function App() {
         />
       </View>
     </ScrollView>
+    <CreateSubscriptionModal
+      visible={isCreateModalVisible}
+      onClose={() => setIsCreateModalVisible(false)}
+      onCreate={handleCreateSubscription}
+    />
     </SafeAreaView>
   );
 }

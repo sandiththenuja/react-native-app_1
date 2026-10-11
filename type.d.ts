@@ -18,6 +18,7 @@ declare global {
         name: string;
         plan?: string;
         category?: string;
+        frequency?: "Monthly" | "Yearly";
         paymentMethod?: string;
         status?: string;
         startDate?: string;

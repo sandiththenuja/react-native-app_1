@@ -82,6 +82,10 @@
         @apply size-12;
     }
 
+    @utility home-add-button {
+        @apply items-center justify-center;
+    }
+
     @utility home-balance-card {
         @apply my-2.5 min-h-50 justify-between gap-5 rounded-bl-4xl rounded-tr-4xl bg-accent p-6;
     }
@@ -148,6 +152,18 @@
 
     @utility sub-card-expanded {
         @apply bg-subscription;
+    }
+
+    @utility subscription-search {
+        @apply min-h-14 flex-row items-center gap-3 rounded-2xl border border-border bg-card px-4;
+    }
+
+    @utility subscription-search-input {
+        @apply min-w-0 flex-1 py-4 text-base font-sans-medium text-primary;
+    }
+
+    @utility subscription-search-clear {
+        @apply items-center justify-center py-2;
     }
 
     @utility sub-head {

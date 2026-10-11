@@ -11,6 +11,8 @@ import {
   isValidPassword,
   isValidVerificationCode,
 } from "@/lib/auth-validation";
+import { posthog } from "@/lib/posthog";
+import { posthogLogger } from "@/lib/posthog-logger";
 
 type SignUpStep = "details" | "verify" | "finish";
 
@@ -39,6 +41,10 @@ export default function SignUp() {
       return;
     }
 
+    posthog?.capture("sign_up_completed");
+    posthogLogger.info("account registration finalized", {
+      authentication_flow: "sign_up",
+    });
     router.replace("/(tabs)");
   }
 
