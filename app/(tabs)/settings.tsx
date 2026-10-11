@@ -6,6 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import {
   getAuthErrorMessage,
 } from "@/lib/auth-validation";
+import { posthog } from "@/lib/posthog";
 
 export default function Settings() {
   const { user, isLoaded } = useUser();
@@ -18,6 +19,8 @@ export default function Settings() {
     setErrorMessage(null);
     try {
       await clerk.signOut();
+      posthog?.capture("sign_out_completed");
+      posthog?.reset();
     } catch (error) {
       setErrorMessage(
         getAuthErrorMessage(

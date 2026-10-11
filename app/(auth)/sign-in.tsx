@@ -12,6 +12,8 @@ import {
   isValidPassword,
   isValidVerificationCode,
 } from "@/lib/auth-validation";
+import { posthog } from "@/lib/posthog";
+import { posthogLogger } from "@/lib/posthog-logger";
 
 type SignInStep =
   | "password"
@@ -36,7 +38,9 @@ export default function SignIn() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isPending = isSubmitting || fetchStatus === "fetching";
 
-  async function finishSignIn() {
+  async function finishSignIn(
+    event: "sign_in_completed" | "password_reset_completed" = "sign_in_completed",
+  ) {
     const { error } = await signIn.finalize();
     if (error) {
       setStep("finish");
@@ -46,6 +50,11 @@ export default function SignIn() {
       return;
     }
 
+    posthog?.capture(event);
+    posthogLogger.info("authentication finalized", {
+      authentication_flow:
+        event === "password_reset_completed" ? "password_reset" : "sign_in",
+    });
     router.replace("/(tabs)");
   }
 
@@ -339,7 +348,7 @@ export default function SignIn() {
         return;
       }
 
-      await finishSignIn();
+      await finishSignIn("password_reset_completed");
     } catch (error) {
       setFormError(
         getAuthErrorMessage(
