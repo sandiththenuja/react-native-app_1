@@ -14,6 +14,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { colors } from "@/constants/theme";
 import { icons } from "@/constants/icons";
+import { posthog } from "@/lib/posthog";
 
 const categories = [
   "Entertainment",
@@ -111,6 +112,14 @@ export default function CreateSubscriptionModal({
     };
 
     onCreate(subscription);
+
+    posthog?.capture('subscription_created', {
+      subscription_name: trimmedName,
+      subscription_price: parsedPrice,
+      subscription_frequency: frequency,
+      subscription_category: category,
+    })
+
     resetForm();
     onClose();
   }
